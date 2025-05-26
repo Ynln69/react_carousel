@@ -10,7 +10,7 @@ interface CarouselProps {
   infinite?: boolean;
 }
 
-const Carousel: React.FC<CarouselProps> = ({
+export const Carousel: React.FC<CarouselProps> = ({
   images,
   itemWidth = 130,
   frameSize = 3,
@@ -19,67 +19,81 @@ const Carousel: React.FC<CarouselProps> = ({
   infinite = false,
 }) => {
   const [position, setPosition] = useState(0);
-
   const maxPosition = images.length - frameSize;
 
-  const handleNext = () => {
-    const newPosition = position + step;
+  const scrollTo = (target: number) => {
+    if (infinite) {
+      const wrapped =
+        target < 0 ? maxPosition : target > maxPosition ? 0 : target;
 
-    if (newPosition > maxPosition) {
-      if (infinite) {
-        setPosition(0);
-      }
+      setPosition(wrapped);
     } else {
-      setPosition(newPosition);
+      setPosition(Math.max(0, Math.min(target, maxPosition)));
     }
   };
 
-  const handlePrev = () => {
-    const newPosition = position - step;
+  const handlePrev = () => scrollTo(position - step);
+  const handleNext = () => scrollTo(position + step);
 
-    if (newPosition < 0) {
-      if (infinite) {
-        setPosition(maxPosition);
-      }
-    } else {
-      setPosition(newPosition);
-    }
-  };
+  const isPrevDisabled = !infinite && position === 0;
+  const isNextDisabled = !infinite && position === maxPosition;
 
   return (
     <div
       className="carousel"
-      style={{ width: `${frameSize * itemWidth}px`, overflow: 'hidden' }}
+      style={{
+        width: `${frameSize * itemWidth}px`,
+        overflow: 'hidden',
+        position: 'relative',
+      }}
     >
       <ul
         className="carousel__list"
         style={{
+          display: 'flex',
           transform: `translateX(-${position * itemWidth}px)`,
           transition: `transform ${animationDuration}ms ease`,
+          padding: 0,
+          margin: 0,
+          listStyle: 'none',
         }}
       >
         {images.map((image, index) => (
-          <li key={index} style={{ width: `${itemWidth}px`, flexShrink: 0 }}>
+          <li
+            key={index}
+            className="carousel__item"
+            style={{ width: `${itemWidth}px`, flexShrink: 0 }}
+          >
             <img
               src={image}
               alt={`Slide ${index + 1}`}
               width={itemWidth}
               style={{ width: `${itemWidth}px`, height: 'auto' }}
+              loading="lazy"
             />
           </li>
         ))}
       </ul>
 
       <div className="carousel__controls">
-        <button type="button" onClick={handlePrev} className="carousel__btn">
+        <button
+          type="button"
+          onClick={handlePrev}
+          disabled={isPrevDisabled}
+          className="carousel__btn"
+          aria-label="Previous slide"
+          data-cy="prev"
+        >
           Prev
         </button>
 
         <button
           type="button"
           onClick={handleNext}
-          data-cy="next"
+          disabled={isNextDisabled}
           className="carousel__btn"
+          aria-label="Next slide"
+          data-cy="next"
         >
           Next
         </button>
