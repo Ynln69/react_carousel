@@ -53,7 +53,9 @@ class App extends React.Component<{}, State> {
 
     return (
       <div className="App">
-        <h1 data-cy="title">Carousel with {images.length} images</h1>
+        <h1 data-cy="title" className="title">
+          Carousel with {images.length} images
+        </h1>
 
         <div className="controls">
           <label htmlFor="itemId" className="controls__label">

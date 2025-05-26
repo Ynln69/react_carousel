@@ -35,27 +35,23 @@ export const Carousel: React.FC<CarouselProps> = ({
   const handlePrev = () => scrollTo(position - step);
   const handleNext = () => scrollTo(position + step);
 
-  const isPrevDisabled = !infinite && position === 0;
-  const isNextDisabled = !infinite && position === maxPosition;
+  const isAtStart = position === 0;
+  const isAtEnd = position >= maxPosition;
+  const isPrevDisabled = !infinite && isAtStart;
+  const isNextDisabled = !infinite && isAtEnd;
 
   return (
     <div
       className="carousel"
       style={{
-        width: `${frameSize * itemWidth}px`,
-        overflow: 'hidden',
-        position: 'relative',
+        maxWidth: `${frameSize * itemWidth}px`,
       }}
     >
       <ul
         className="carousel__list"
         style={{
-          display: 'flex',
           transform: `translateX(-${position * itemWidth}px)`,
           transition: `transform ${animationDuration}ms ease`,
-          padding: 0,
-          margin: 0,
-          listStyle: 'none',
         }}
       >
         {images.map((image, index) => (
